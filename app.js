@@ -5,7 +5,7 @@ const { createClient } = supabase;
 const SUPABASE_URL = 'https://jwmyhrldrqxhwletbtyy.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'sb_publishable_3qvX38tpEJ76PjGv3mmYYg_Hv-WAoMO';
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================
 // ESTADO GLOBAL
@@ -27,17 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================
-// AUTENTICACIÓN
+// AUTENTICACIÓN (Magic Link por Email)
 // ============================================
 function initAuth() {
-    // Botón de Google oculto por ahora, usamos email
     const loginBtn = document.getElementById('google-login');
-    loginBtn.innerHTML = '📧 Ingresar con Email';
-    loginBtn.onclick = async () => {
+    loginBtn.addEventListener('click', async () => {
         const email = prompt('Ingresa tu email:');
         if (!email) return;
         
-        const { error } = await supabaseClient.auth.signInWithOtp({
+        const { error } = await supabase.auth.signInWithOtp({
             email: email,
             options: {
                 emailRedirectTo: window.location.origin
@@ -49,10 +47,10 @@ function initAuth() {
         } else {
             showToast('Revisa tu email para el link de acceso');
         }
-    };
+    });
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-        await supabaseClient.auth.signOut();
+        await supabase.auth.signOut();
         location.reload();
     });
 }
@@ -85,7 +83,6 @@ function showApp() {
 function initTabs() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => {
-            // Update active state
             document.querySelectorAll('.nav-tab').forEach(t => {
                 t.classList.remove('text-emerald-400', 'border-emerald-400');
                 t.classList.add('text-slate-400', 'border-transparent');
@@ -93,7 +90,6 @@ function initTabs() {
             tab.classList.remove('text-slate-400', 'border-transparent');
             tab.classList.add('text-emerald-400', 'border-emerald-400');
 
-            // Show content
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
 
@@ -197,13 +193,11 @@ function processExcel(file) {
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-            // Procesar filas (saltar header)
             const nuevosGastos = [];
             for (let i = 1; i < jsonData.length; i++) {
                 const row = jsonData[i];
                 if (!row[0]) continue;
 
-                // Mapeo según tus columnas: FECHA, DESCRIPCION, TITULAR/ADICIONAL, MONTO, CUOTAS PENDIENTES, VALOR CUOTA
                 const fecha = parseDate(row[0]);
                 const descripcion = String(row[1] || '').trim();
                 const titular = String(row[2] || '').trim();
@@ -211,7 +205,6 @@ function processExcel(file) {
                 const cuotasPendientes = row[4] ? parseInt(row[4]) : null;
                 const valorCuota = row[5] ? parseFloat(row[5]) : null;
 
-                // Limpiar monto (puede venir con puntos de miles y comas decimales)
                 let monto = 0;
                 if (typeof montoRaw === 'number') {
                     monto = montoRaw;
@@ -221,7 +214,6 @@ function processExcel(file) {
 
                 if (!fecha || isNaN(monto) || monto === 0) continue;
 
-                // Detectar categoría automáticamente
                 const categoria = detectarCategoria(descripcion);
 
                 nuevosGastos.push({
@@ -233,7 +225,7 @@ function processExcel(file) {
                     cuotas_pendientes: cuotasPendientes,
                     valor_cuota: valorCuota,
                     categoria: categoria,
-                    porcentaje_usuario: 50, // Default 50/50
+                    porcentaje_usuario: 50,
                     es_manual: false,
                     created_at: new Date().toISOString()
                 });
@@ -255,18 +247,14 @@ function processExcel(file) {
 
 function parseDate(dateValue) {
     if (typeof dateValue === 'number') {
-        // Excel serial date
         return new Date((dateValue - 25569) * 86400 * 1000).toISOString().split('T')[0];
     }
     if (typeof dateValue === 'string') {
-        // Try DD/MM/YYYY or YYYY-MM-DD
         const parts = dateValue.split(/[\/\-]/);
         if (parts.length === 3) {
             if (parts[2].length === 4) {
-                // DD/MM/YYYY
                 return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
             }
-            // YYYY-MM-DD
             return dateValue;
         }
     }
@@ -314,7 +302,7 @@ async function saveGastosBatch(gastosArray) {
 // RENDERIZADO: DASHBOARD
 // ============================================
 function renderDashboard() {
-    const mesActual = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const mesActual = new Date().toISOString().slice(0, 7);
     const gastosMes = gastos.filter(g => g.fecha.startsWith(mesActual));
     
     const totalMes = gastosMes.reduce((sum, g) => sum + g.monto, 0);
@@ -323,7 +311,6 @@ function renderDashboard() {
     document.getElementById('total-mes').textContent = formatCurrency(totalMes);
     document.getElementById('mi-parte').textContent = formatCurrency(miParte);
 
-    // Chart by category
     const porCategoria = {};
     gastosMes.forEach(g => {
         porCategoria[g.categoria] = (porCategoria[g.categoria] || 0) + g.monto;
@@ -352,7 +339,6 @@ function renderDashboard() {
         `;
     });
 
-    // Recent activity
     const recentContainer = document.getElementById('recent-activity');
     recentContainer.innerHTML = '';
     gastos.slice(0, 5).forEach(g => {
@@ -443,7 +429,6 @@ function renderAhorro() {
     container.innerHTML = '';
 
     cuentasAhorro.forEach(c => {
-        // Calcular préstamos activos de esta cuenta
         const prestamosCuenta = prestamos.filter(p => p.cuenta_id === c.id);
         const totalPrestado = prestamosCuenta.reduce((sum, p) => sum + p.monto, 0);
         const saldoReal = c.saldo - totalPrestado;
@@ -468,7 +453,6 @@ function renderAhorro() {
         `;
     });
 
-    // Préstamos activos
     const prestamosContainer = document.getElementById('prestamos-activos');
     prestamosContainer.innerHTML = '';
 
@@ -521,7 +505,6 @@ function renderAhorro() {
 // MODALES Y FORMULARIOS
 // ============================================
 function initModals() {
-    // Modal Gasto
     document.getElementById('cancel-gasto').addEventListener('click', () => toggleModal('modal-gasto', false));
     document.getElementById('form-gasto').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -546,7 +529,6 @@ function initModals() {
         showToast('Gasto actualizado');
     });
 
-    // Modal Cuenta
     document.getElementById('add-cuenta-btn').addEventListener('click', () => toggleModal('modal-cuenta', true));
     document.getElementById('cancel-cuenta').addEventListener('click', () => toggleModal('modal-cuenta', false));
     document.getElementById('form-cuenta').addEventListener('submit', async (e) => {
@@ -570,7 +552,6 @@ function initModals() {
         showToast('Cuenta creada exitosamente');
     });
 
-    // Modal Préstamo
     document.getElementById('cancel-prestamo').addEventListener('click', () => toggleModal('modal-prestamo', false));
     document.getElementById('form-prestamo').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -603,7 +584,6 @@ function initModals() {
         showToast('Préstamo registrado');
     });
 
-    // Modal Manual
     document.getElementById('add-manual-btn').addEventListener('click', () => {
         document.getElementById('manual-fecha').value = new Date().toISOString().split('T')[0];
         toggleModal('modal-manual', true);
@@ -634,7 +614,6 @@ function initModals() {
         showToast('Gasto agregado');
     });
 
-    // Calcular cuota en tiempo real
     document.getElementById('prestamo-monto').addEventListener('input', calcularCuota);
     document.getElementById('prestamo-cuotas').addEventListener('input', calcularCuota);
 }
@@ -716,15 +695,14 @@ function getCatEmoji(cat) {
 }
 
 function showToast(message) {
-    // Simple toast notification
     const toast = document.createElement('div');
-    toast.className = 'fixed bottom-4 left-4 right-4 bg-slate-800 border border-slate-600 text-white px-4 py-3 rounded-xl shadow-2xl z-50 text-sm text-center transform translate-y-0 transition-transform';
+    toast.className = 'fixed bottom-4 left-4 right-4 bg-slate-800 border border-slate-600 text-white px-4 py-3 rounded-xl shadow-2xl z-50 text-sm text-center';
     toast.textContent = message;
     document.body.appendChild(toast);
     
     setTimeout(() => {
-        toast.style.transform = 'translateY(100px)';
         toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
