@@ -1,7 +1,6 @@
 // ============================================
 // CONFIGURACIÓN SUPABASE (Reemplaza con tus credenciales)
 // ============================================
-const { createClient } = supabase;
 const SUPABASE_URL = 'https://jwmyhrldrqxhwletbtyy.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'sb_publishable_3qvX38tpEJ76PjGv3mmYYg_Hv-WAoMO';
 

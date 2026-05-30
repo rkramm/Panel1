@@ -6,13 +6,21 @@
     <meta name="theme-color" content="#0f172a">
     <title>Finanzas Compartidas</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==">
+    
+    <!-- Tailwind CDN funcional (la advertencia es normal, funciona igual) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Sin apple-touch-icon problemático -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Supabase CDN oficial -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- SheetJS para Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
+    
     <!-- Auth Screen -->
     <div id="auth-screen" class="flex flex-col items-center justify-center min-h-screen p-6">
         <div class="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl border border-slate-700">
@@ -32,7 +40,6 @@
 
     <!-- Main App -->
     <div id="app-screen" class="hidden">
-        <!-- Header -->
         <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
             <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
                 <h1 class="font-bold text-lg">💰 Finanzas</h1>
@@ -47,22 +54,14 @@
             </div>
         </header>
 
-        <!-- Navigation -->
         <nav class="bg-slate-800 border-b border-slate-700">
             <div class="max-w-lg mx-auto flex">
-                <button class="nav-tab flex-1 py-3 text-sm font-medium text-emerald-400 border-b-2 border-emerald-400" data-tab="dashboard">
-                    📊 Resumen
-                </button>
-                <button class="nav-tab flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent" data-tab="gastos">
-                    💳 Gastos
-                </button>
-                <button class="nav-tab flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent" data-tab="ahorro">
-                    🏦 Ahorro
-                </button>
+                <button class="nav-tab flex-1 py-3 text-sm font-medium text-emerald-400 border-b-2 border-emerald-400" data-tab="dashboard">📊 Resumen</button>
+                <button class="nav-tab flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent" data-tab="gastos">💳 Gastos</button>
+                <button class="nav-tab flex-1 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent" data-tab="ahorro">🏦 Ahorro</button>
             </div>
         </nav>
 
-        <!-- Dashboard Tab -->
         <div id="tab-dashboard" class="tab-content max-w-lg mx-auto p-4 space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-800 rounded-xl p-4 border border-slate-700">
@@ -75,7 +74,7 @@
                 </div>
             </div>
 
-            <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 border-dashed border-2 border-slate-600" id="drop-zone">
+            <div class="bg-slate-800 rounded-xl p-6 border-2 border-dashed border-slate-600 cursor-pointer hover:border-emerald-500 transition" id="drop-zone">
                 <div class="text-center">
                     <svg class="w-10 h-10 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
@@ -97,25 +96,19 @@
             </div>
         </div>
 
-        <!-- Gastos Tab -->
         <div id="tab-gastos" class="tab-content hidden max-w-lg mx-auto p-4 space-y-4">
             <div class="flex gap-2 mb-4">
                 <select id="month-filter" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm flex-1">
                     <option value="all">Todos los meses</option>
                 </select>
-                <button id="add-manual-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                    + Manual
-                </button>
+                <button id="add-manual-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium">+ Manual</button>
             </div>
             <div id="gastos-list" class="space-y-2"></div>
         </div>
 
-        <!-- Ahorro Tab -->
         <div id="tab-ahorro" class="tab-content hidden max-w-lg mx-auto p-4 space-y-4">
             <div id="cuentas-ahorro" class="space-y-3"></div>
-            <button id="add-cuenta-btn" class="w-full bg-slate-800 border border-dashed border-slate-600 rounded-xl p-4 text-slate-400 hover:text-white hover:border-slate-400 transition text-sm">
-                + Nueva Cuenta de Ahorro
-            </button>
+            <button id="add-cuenta-btn" class="w-full bg-slate-800 border border-dashed border-slate-600 rounded-xl p-4 text-slate-400 hover:text-white hover:border-slate-400 transition text-sm">+ Nueva Cuenta de Ahorro</button>
             <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 mt-4">
                 <h3 class="font-semibold mb-3 text-sm">Préstamos Activos</h3>
                 <div id="prestamos-activos" class="space-y-3"></div>
@@ -123,26 +116,16 @@
         </div>
     </div>
 
-    <!-- Modal: Edit Gasto -->
+    <!-- Modales -->
     <div id="modal-gasto" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm p-6 border border-slate-700">
             <h3 class="font-bold text-lg mb-4">Editar Gasto</h3>
             <form id="form-gasto" class="space-y-4">
                 <input type="hidden" id="gasto-id">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Descripción</label>
-                    <input type="text" id="gasto-desc" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Monto Total</label>
-                    <input type="text" id="gasto-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Tu Porcentaje (%)</label>
-                    <input type="number" id="gasto-porcentaje" min="0" max="100" value="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Categoría</label>
+                <div><label class="block text-xs text-slate-400 mb-1">Descripción</label><input type="text" id="gasto-desc" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Monto Total</label><input type="text" id="gasto-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Tu Porcentaje (%)</label><input type="number" id="gasto-porcentaje" min="0" max="100" value="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Categoría</label>
                     <select id="gasto-categoria" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm">
                         <option value="supermercado">🛒 Supermercado</option>
                         <option value="transporte">🚗 Transporte</option>
@@ -163,19 +146,12 @@
         </div>
     </div>
 
-    <!-- Modal: Add Cuenta Ahorro -->
     <div id="modal-cuenta" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm p-6 border border-slate-700">
             <h3 class="font-bold text-lg mb-4">Nueva Cuenta de Ahorro</h3>
             <form id="form-cuenta" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nombre</label>
-                    <input type="text" id="cuenta-nombre" placeholder="Ej: Vacaciones 2024" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Saldo Inicial</label>
-                    <input type="number" id="cuenta-saldo" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
+                <div><label class="block text-xs text-slate-400 mb-1">Nombre</label><input type="text" id="cuenta-nombre" placeholder="Ej: Vacaciones 2024" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Saldo Inicial</label><input type="number" id="cuenta-saldo" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
                 <div class="flex gap-2 pt-2">
                     <button type="button" id="cancel-cuenta" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg text-sm">Cancelar</button>
                     <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 py-2 rounded-lg text-sm font-medium">Crear</button>
@@ -184,29 +160,15 @@
         </div>
     </div>
 
-    <!-- Modal: Retirar/Prestar -->
     <div id="modal-prestamo" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm p-6 border border-slate-700">
             <h3 class="font-bold text-lg mb-4">Retirar de Ahorro</h3>
             <form id="form-prestamo" class="space-y-4">
                 <input type="hidden" id="prestamo-cuenta-id">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Cuenta</label>
-                    <input type="text" id="prestamo-cuenta-nombre" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Monto a Retirar</label>
-                    <input type="number" id="prestamo-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Motivo / Descripción</label>
-                    <input type="text" id="prestamo-motivo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Cuotas de Devolución</label>
-                    <input type="number" id="prestamo-cuotas" min="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                    <p class="text-xs text-slate-500 mt-1">Monto mensual: <span id="monto-cuota" class="text-emerald-400">$0</span></p>
-                </div>
+                <div><label class="block text-xs text-slate-400 mb-1">Cuenta</label><input type="text" id="prestamo-cuenta-nombre" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" readonly></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Monto a Retirar</label><input type="number" id="prestamo-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Motivo</label><input type="text" id="prestamo-motivo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Cuotas</label><input type="number" id="prestamo-cuotas" min="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required><p class="text-xs text-slate-500 mt-1">Monto mensual: <span id="monto-cuota" class="text-emerald-400">$0</span></p></div>
                 <div class="flex gap-2 pt-2">
                     <button type="button" id="cancel-prestamo" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg text-sm">Cancelar</button>
                     <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 py-2 rounded-lg text-sm font-medium">Retirar</button>
@@ -215,25 +177,14 @@
         </div>
     </div>
 
-    <!-- Modal: Add Manual Gasto -->
     <div id="modal-manual" class="hidden fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm p-6 border border-slate-700">
             <h3 class="font-bold text-lg mb-4">Agregar Gasto Manual</h3>
             <form id="form-manual" class="space-y-4">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Fecha</label>
-                    <input type="date" id="manual-fecha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Descripción</label>
-                    <input type="text" id="manual-desc" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Monto</label>
-                    <input type="number" id="manual-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Categoría</label>
+                <div><label class="block text-xs text-slate-400 mb-1">Fecha</label><input type="date" id="manual-fecha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Descripción</label><input type="text" id="manual-desc" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Monto</label><input type="number" id="manual-monto" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" required></div>
+                <div><label class="block text-xs text-slate-400 mb-1">Categoría</label>
                     <select id="manual-categoria" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm">
                         <option value="supermercado">🛒 Supermercado</option>
                         <option value="transporte">🚗 Transporte</option>
