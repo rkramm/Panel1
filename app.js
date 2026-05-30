@@ -1,10 +1,11 @@
 // ============================================
 // CONFIGURACIÓN SUPABASE (Reemplaza con tus credenciales)
 // ============================================
+const { createClient } = supabase;
 const SUPABASE_URL = 'https://jwmyhrldrqxhwletbtyy.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'sb_publishable_3qvX38tpEJ76PjGv3mmYYg_Hv-WAoMO';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================
 // ESTADO GLOBAL
@@ -29,18 +30,29 @@ document.addEventListener('DOMContentLoaded', () => {
 // AUTENTICACIÓN
 // ============================================
 function initAuth() {
-    document.getElementById('google-login').addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
+    // Botón de Google oculto por ahora, usamos email
+    const loginBtn = document.getElementById('google-login');
+    loginBtn.innerHTML = '📧 Ingresar con Email';
+    loginBtn.onclick = async () => {
+        const email = prompt('Ingresa tu email:');
+        if (!email) return;
+        
+        const { error } = await supabaseClient.auth.signInWithOtp({
+            email: email,
             options: {
-                redirectTo: window.location.origin
+                emailRedirectTo: window.location.origin
             }
         });
-        if (error) showToast('Error al iniciar sesión: ' + error.message);
-    });
+        
+        if (error) {
+            showToast('Error: ' + error.message);
+        } else {
+            showToast('Revisa tu email para el link de acceso');
+        }
+    };
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         location.reload();
     });
 }
